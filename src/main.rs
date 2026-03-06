@@ -357,9 +357,11 @@ impl<'de> Deserialize<'de> for ModSettings {
 }
 
 #[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
+#[command(author, version, about = "Converts Factorio mod-settings.dat files to/from JSON and YAML", long_about = "Automatically detects format based on file extension (.dat, .json, .yaml, .yml).")]
 struct Args {
+    /// Path to the input file (.dat, .json, .yaml, or .yml)
     input: PathBuf,
+    /// Path to the output file (defaults to changing .dat to .json, or vice-versa)
     output: Option<PathBuf>,
 }
 

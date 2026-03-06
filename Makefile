@@ -1,4 +1,4 @@
-.PHONY: all build check test clean integration
+.PHONY: all build check test clean integration install
 
 # Default target
 all: build
@@ -6,6 +6,11 @@ all: build
 # Build the project in release mode
 build:
 	cargo build --release
+
+# Install the binary to ~/.local/bin
+install: build
+	mkdir -p ~/.local/bin
+	cp target/release/factorio-mod-settings-converter ~/.local/bin/
 
 # Run cargo check
 check:
