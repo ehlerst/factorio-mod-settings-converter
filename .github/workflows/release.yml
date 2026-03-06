@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build - ${{ matrix.target }}
@@ -55,6 +58,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ${{ matrix.binary_name }}-${{ matrix.target }}.*
         asset_name: ${{ matrix.binary_name }}-${{ matrix.target }}
-        tag: ${{ github.ref }}
+        tag: ${{ github.ref_name }}
         overwrite: true
         file_glob: true
