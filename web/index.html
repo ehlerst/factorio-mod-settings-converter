@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Factorio mod-settings converter (WASM)</title>
+  <style>
+    :root {
+      --bg: #1b1f24; --panel: #242a31; --border: #3a4450;
+      --accent: #e2953c; --text: #d8dee5; --muted: #8a939e;
+      --ok: #7bb662; --err: #d46a6a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 2rem;
+      background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    h1 { font-size: 1.4rem; }
+    h1 span { color: var(--accent); }
+    .note { color: var(--muted); font-size: .85rem; }
+    .grid {
+      display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+    .panel {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem;
+    }
+    .drop {
+      border: 2px dashed var(--border); border-radius: 8px;
+      padding: 2rem 1rem; text-align: center; cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .drop.active { border-color: var(--accent); background: rgba(226,149,60,.08); }
+    .drop p { margin: .4rem 0; }
+    #fileInput { display: none; }
+    .row { display: flex; gap: .5rem; align-items: center; margin-top: .75rem; flex-wrap: wrap; }
+    button {
+      background: var(--panel); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: .45rem .9rem; cursor: pointer; font-size: .9rem;
+    }
+    button:hover { border-color: var(--accent); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    button.primary { background: var(--accent); color: #14181c; border-color: var(--accent); font-weight: 600; }
+    #formatData, #formatText { font-size: .85rem; }
+    .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .seg button { border: none; border-radius: 0; padding: .35rem .8rem; }
+    .seg button.on { background: var(--accent); color: #14181c; font-weight: 600; }
+    textarea {
+      width: 100%; min-height: 60vh; resize: vertical;
+      background: var(--bg); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: .75rem; font: 13px/1.45 ui-monospace, "SF Mono", Menlo, monospace;
+      white-space: pre; tab-size: 2;
+    }
+    textarea:focus { outline: 1px solid var(--accent); }
+    #status { margin-top: .5rem; font-size: .85rem; min-height: 1.2em; }
+    #status.ok { color: var(--ok); }
+    #status.err { color: var(--err); }
+    kbd {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 4px; padding: 0 .35em; font-size: .8em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Factorio <span>mod-settings.dat</span> converter &mdash; in-browser WASM</h1>
+  <p class="note">
+    Everything runs client-side with <code>wasm32-unknown-unknown</code>; no uploads, no server.
+    Supported in: <code>.dat</code> / <code>.json</code> / <code>.yaml</code>(<code>.yml</code>).
+  </p>
+
+  <div class="grid">
+    <div>
+      <div class="panel">
+        <div class="drop" id="drop" title="click to pick a file">
+          <p><strong>Drop a file here</strong></p>
+          <p class="note">or click to browse &mdash; try the repo's own <kbd>mod-settings.dat</kbd></p>
+        </div>
+        <input type="file" id="fileInput" accept=".dat,.json,.yaml,.yml">
+        <div class="row">
+          <span class="seg" id="formatSeg" hidden>
+            <button id="formatData" class="on" data-fmt="data">.dat</button>
+            <button id="formatText" data-fmt="text">text</button>
+          </span>
+          <small class="note" id="fmtNote"></small>
+        </div>
+        <div class="row">
+          <button class="primary" id="btnEncode" disabled title="Re-encode the edited text and swap to the .dat view">Encode &rarr; .dat</button>
+          <button class="primary" id="btnDecode" disabled title="Re-decode the current .dat bytes into JSON/YAML">Decode &rarr; text</button>
+        </div>
+        <div class="row">
+          <button id="btnDownloadDat" disabled>Download <code>.dat</code></button>
+          <button id="btnDownloadText" disabled>Download JSON / YAML</button>
+        </div>
+        <div id="status"></div>
+      </div>
+      <p class="note">
+        Byte-identical round-trips are asserted by the repo's Node check
+        (<code>web/test.mjs</code>) and unit tests: editing the text form and
+        re-encoding loses internal <code>any_type</code> flags (see plan caveats),
+        but untouched decode &rarr; encode reproduces the file exactly.
+      </p>
+    </div>
+
+    <div class="panel">
+      <textarea id="editor" spellcheck="false" placeholder="Decode a dropped file to edit its JSON / YAML here&hellip;"></textarea>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
