@@ -1,13 +1,13 @@
 // Node round-trip verification: dat -> json -> dat must be byte-identical,
 // same guarantee as `make integration` proves natively.
-import { initSync, dat_to_json, dat_to_yaml, yaml_to_dat, json_to_dat } from '../pkg/factorio_mod_settings_converter.js';
+import { initSync, dat_to_json, dat_to_yaml, yaml_to_dat, json_to_dat } from './pkg/factorio_mod_settings_converter.js';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { Buffer } from 'node:buffer';
 
 // Node 21 can't fetch(file://), so init synchronously from the wasm bytes.
 // Paths are resolved relative to this script via import.meta.url, not CWD.
-initSync({ module: readFileSync(new URL('../pkg/factorio_mod_settings_converter_bg.wasm', import.meta.url)) });
+initSync({ module: readFileSync(new URL('./pkg/factorio_mod_settings_converter_bg.wasm', import.meta.url)) });
 
 const bytes = readFileSync(new URL('../mod-settings.dat', import.meta.url));
 const md5 = (b) => createHash('md5').update(b).digest('hex');

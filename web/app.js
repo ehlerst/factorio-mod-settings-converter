@@ -3,10 +3,13 @@
 //   dataBytes: Uint8Array | null — the current .dat payload (source of truth while in .dat view)
 //   textFmt: "json" | "yaml"    — which text format the editor shows
 //   textIsFreshDecode: bool     — editor text == current dataBytes' decode
-import init from '../pkg/factorio_mod_settings_converter.js';
+// NOTE: pkg/ is built INTO web/pkg (wasm-pack --out-dir web/pkg) so the import
+// is `./pkg/...` — correct both locally (serve repo root) and on GitHub Pages
+// (site root = app.js's directory).
+import init from './pkg/factorio_mod_settings_converter.js';
 import {
   dat_to_json, dat_to_yaml, json_to_dat, yaml_to_dat,
-} from '../pkg/factorio_mod_settings_converter.js';
+} from './pkg/factorio_mod_settings_converter.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
